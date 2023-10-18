@@ -16,6 +16,14 @@ namespace week_19.Api.Controllers
             _db = db;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] string query)
+        {
+            var userList = await _db.SearchAsync(query);
+
+            return Ok(userList);
+        }
+
         [HttpPost]
         public async Task<ActionResult<User>> Register([FromBody]RegisterDto newUser)
         {

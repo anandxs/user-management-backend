@@ -20,6 +20,9 @@ namespace week_19.Api.Services
         public async Task<List<User>> GetAsync() =>
             await _userCollection.Find(_ => true).ToListAsync();
 
+        public async Task<List<User>> SearchAsync(string searchString) =>
+            await _userCollection.Find(x => x.Email.Contains(searchString)).ToListAsync();
+
         public async Task<User?> GetAsync(string id) =>
             await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
