@@ -41,6 +41,14 @@ namespace week_19.Api.Controllers
             if (newUser is null || newUser.Email == String.Empty)
                 return BadRequest();
 
+            var existingUser = await _db.GetAsync(newUser.Email);
+
+            if (existingUser is not null)
+            {
+                ModelState.AddModelError("emailTaken", "Email is already taken");
+                return BadRequest(ModelState);
+            }
+
             User model = new()
             {
                 Email = newUser.Email,
