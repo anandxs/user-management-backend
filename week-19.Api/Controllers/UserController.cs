@@ -24,6 +24,17 @@ namespace week_19.Api.Controllers
             return Ok(userList);
         }
 
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUser(string email)
+        {
+            var user = await _db.GetAsync(email);
+
+            if (user is null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
         [HttpPost]
         public async Task<ActionResult<User>> Register([FromBody]RegisterDto newUser)
         {

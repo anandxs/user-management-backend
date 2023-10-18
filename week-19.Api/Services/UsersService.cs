@@ -27,8 +27,8 @@ namespace week_19.Api.Services
         public async Task<User> ValidateUserAsync(LoginDto loginDto) =>
             await _userCollection.Find(x => x.Email == loginDto.Email && x.Password == loginDto.Password).FirstOrDefaultAsync();
 
-        public async Task<User?> GetAsync(string id) =>
-            await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        public async Task<User?> GetAsync(string email) =>
+            await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
 
         public async Task CreateAsync(User newUser) =>
             await _userCollection.InsertOneAsync(newUser);
