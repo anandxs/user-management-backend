@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using week_19.Api.Models;
+using week_19.Api.Models.Dto;
 using week_19.Api.Models.Settings;
 
 namespace week_19.Api.Services
@@ -22,6 +23,9 @@ namespace week_19.Api.Services
 
         public async Task<List<User>> SearchAsync(string searchString) =>
             await _userCollection.Find(x => x.Email.Contains(searchString)).ToListAsync();
+
+        public async Task<User> ValidateUserAsync(LoginDto loginDto) =>
+            await _userCollection.Find(x => x.Email == loginDto.Email && x.Password == loginDto.Password).FirstOrDefaultAsync();
 
         public async Task<User?> GetAsync(string id) =>
             await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
