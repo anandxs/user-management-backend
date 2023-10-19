@@ -21,13 +21,16 @@ namespace week_19.Api.Services
         public async Task<List<User>> GetAsync() =>
             await _userCollection.Find(_ => true).ToListAsync();
 
+        public async Task<User> GetAsync(string id) =>
+            await _userCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+
         public async Task<List<User>> SearchAsync(string searchString) =>
             await _userCollection.Find(x => x.Email.Contains(searchString)).ToListAsync();
 
         public async Task<User> ValidateUserAsync(LoginDto loginDto) =>
             await _userCollection.Find(x => x.Email == loginDto.Email && x.Password == loginDto.Password).FirstOrDefaultAsync();
 
-        public async Task<User?> GetAsync(string email) =>
+        public async Task<User?> CheckEmailAsync(string email) =>
             await _userCollection.Find(x => x.Email == email).FirstOrDefaultAsync();
 
         public async Task CreateAsync(User newUser) =>

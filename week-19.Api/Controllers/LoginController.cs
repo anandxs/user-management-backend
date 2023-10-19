@@ -38,7 +38,8 @@ namespace week_19.Api.Controllers
                 {
                     email = user.Email,
                     accessToken = token,
-                    role = user.Role
+                    role = user.Role,
+                    id = user.Id,
                 });
         }
 

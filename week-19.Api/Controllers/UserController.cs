@@ -16,18 +16,48 @@ namespace week_19.Api.Controllers
             _db = db;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] string query)
+        [HttpPost("img")]
+        public async Task<IActionResult> UploadImage([FromBody] ImageDto imageDto)
+        {
+            var user = await _db.GetAsync(imageDto.Id);
+
+            try
+            {
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageDto.Img.FileName);
+
+                using (Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    imageDto.Img.CopyTo(stream);
+                }
+
+                return Ok(path);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string query)
         {
             var userList = await _db.SearchAsync(query);
 
             return Ok(userList);
         }
 
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetUser(string email)
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
-            var user = await _db.GetAsync(email);
+            var userList = await _db.GetAsync();
+
+            return Ok(userList);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            var user = await _db.GetAsync(id);
 
             if (user is null)
                 return NotFound();
@@ -41,7 +71,7 @@ namespace week_19.Api.Controllers
             if (newUser is null || newUser.Email == String.Empty)
                 return BadRequest();
 
-            var existingUser = await _db.GetAsync(newUser.Email);
+            var existingUser = await _db.CheckEmailAsync(newUser.Email);
 
             if (existingUser is not null)
             {
@@ -64,7 +94,7 @@ namespace week_19.Api.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, EditDto updatedUser)
+        public async Task<IActionResult> Update(string id, [FromBody]EditDto updatedUser)
         {
             var user = await _db.GetAsync(id);
 
@@ -78,13 +108,15 @@ namespace week_19.Api.Controllers
                 Role = user.Role,
                 FirstName = updatedUser.FirstName,
                 LastName = updatedUser.LastName,
-                Password = updatedUser.Password,
-                ImageUrl = updatedUser.ImageUrl
+                Password = user.Password,
             };
+
+            if (updatedUser.Password is not "")
+                model.Password = updatedUser.Password;
 
             await _db.UpdateAsync(id, model);
 
-            return NoContent();
+            return Ok(new {imageUrl = 'x', firstName = model.FirstName, lastName = model.LastName});
         }
 
         [HttpDelete("{id:length(24)}")]
